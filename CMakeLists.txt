@@ -1,19 +1,25 @@
 cmake_minimum_required(VERSION 3.16.3)
 
-project(TrackerClass)
+set(CMAKE_CXX_STANDARD 20)
 
-find_package(SFML 2.5 COMPONENTS graphics REQUIRED)
+add_compile_options(
+  -O2
+  -g
 
-add_executable(kek src/main.cpp)
+  #-fsanitize=address
 
-target_include_directories(kek PUBLIC include/kek
-                                      include/tracker)
+  -Werror
+  -Wall
+  -Wextra
+  -Wpedantic
+  -DLOGGING
+)
 
+set(INCLUDE_DIR include/tracker)
+set(SRC_FILES src/main.cpp)
 
-# target_link_libraries(my_sfml PUBLIC sfml-graphics)
+project(tracking)
 
-target_link_libraries(kek PUBLIC sfml-graphics)
+add_executable(tracking ${SRC_FILES})
 
-# add_library(liba STATIC liba/zalupa.cpp)
-
-# target_link_libraries(kek PUBLIC liba)
+target_include_directories(tracking PUBLIC ${INCLUDE_DIR})

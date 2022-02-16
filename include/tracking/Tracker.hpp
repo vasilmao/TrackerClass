@@ -38,36 +38,19 @@ class Tracker {
     std::string history_ = "";
   public:
 
-    // Tracker<T>(const T& object) : object_(object) {
-    //     TRACK_CALL
-    //     index_ = node_indexer_++;
-    //     SetAnonVarName();
-    //     SetAnonHistory();
-    //     GraphDumpObject();
-    //     LogDumpCtor(false);
-    // }
-    // Tracker<T>(T&& object)      : object_(object) {
-    //     TRACK_CALL
-    //     index_ = node_indexer_++;
-    //     SetAnonVarName();
-    //     SetAnonHistory();
-    //     GraphDumpObject();
-    //     LogDumpCtor(true);
-    // }
-
-    Tracker<T>(const T& object, std::string parent_history="") : object_(object) {
+    Tracker<T>(const T& object, const std::string& parent_history="") : object_(object) {
         TRACK_CALL
         index_ = node_indexer_++;
         SetAnonVarName();
-        SetAnonHistory(parent_history);
+        SetHistory(parent_history);
         GraphDumpObject();
         LogDumpCtor();
     }
-    Tracker<T>(T&& object, std::string parent_history="")      : object_(object) {
+    Tracker<T>(T&& object, const std::string& parent_history="")      : object_(object) {
         TRACK_CALL
         index_ = node_indexer_++;
         SetAnonVarName();
-        SetAnonHistory(parent_history);
+        SetHistory(parent_history);
         GraphDumpObject();
         LogDumpCtor();
     }
@@ -75,7 +58,7 @@ class Tracker {
     // Tracker<T>(T object, const std::string& var_name)        : object_(object), var_name_(var_name) {
     //     LogName();
     // }
-    Tracker<T>(const T& object, const std::string& var_name, std::string parent_history) : object_(object) {
+    Tracker<T>(const T& object, const std::string& var_name, const std::string& parent_history) : object_(object) {
         TRACK_CALL
         index_ = node_indexer_++;
         GraphDumpObject();
@@ -84,10 +67,10 @@ class Tracker {
         } else {
             var_name_ = var_name;
         }
-        SetAnonHistory(parent_history);
+        SetHistory(parent_history);
         LogDumpCtor();
     }
-    Tracker<T>(T&& object, const std::string& var_name, std::string parent_history)      : object_(object) {
+    Tracker<T>(T&& object, const std::string& var_name, const std::string& parent_history)      : object_(object) {
         TRACK_CALL
         index_ = node_indexer_++;
         GraphDumpObject();
@@ -96,35 +79,25 @@ class Tracker {
         } else {
             var_name_ = var_name;
         }
-        SetAnonHistory(parent_history);
+        SetHistory(parent_history);
         LogDumpCtor();
     }
 
-    Tracker<T>(const Tracker<T>& other, const std::string& var_name, std::string) : object_(other.object_), var_name_(var_name) {
+    Tracker<T>(const Tracker<T>& other, const std::string& var_name, const std::string&) : object_(other.object_), var_name_(var_name) {
         TRACK_CALL
         index_ = node_indexer_++;
-        // std::string log_message = "created ";
-        // log_message += var_name_;
-        // log_message += " that is equals ";
-        // log_message += other.var_name_;
         GraphDumpObject();
         SetEdgeFrom(other, ":=");
-        SetAnonHistory();
-        // LogDumpCtor(other, false);
+        SetHistory();
         LogDumpCtor();
     }
 
-    Tracker<T>(Tracker<T>&& other, const std::string& var_name, std::string)      : object_(other.object_), var_name_(var_name) {
+    Tracker<T>(Tracker<T>&& other, const std::string& var_name, const std::string&)      : object_(other.object_), var_name_(var_name) {
         TRACK_CALL
         index_ = node_indexer_++;
-        // std::string log_message = "created ";
-        // log_message += var_name_;
-        // log_message += " that is equals half-dead ";
-        // log_message += other.var_name_;
         GraphDumpObject();
         SetEdgeFrom(other, "ctor rvalue ref");
         SetRelativeHistory(other);
-        // LogDumpCtor(other, true);
         LogDumpCtor();
     }
 
@@ -132,10 +105,9 @@ class Tracker {
         TRACK_CALL
         index_ = node_indexer_++;
         SetAnonVarName();
-        SetAnonHistory();
+        SetHistory();
         SetEdgeFrom(other, ":=");
         GraphDumpObject();
-        // LogDumpCtor(other, false);
         LogDumpCtor();
     }
     Tracker<T>(Tracker<T>&& other)      : object_(other.object_) {
@@ -145,7 +117,6 @@ class Tracker {
         SetEdgeFrom(other, "ctor rvalue ref");
         GraphDumpObject();
         SetRelativeHistory(other);
-        // LogDumpCtor(other, true);
         LogDumpCtor();
     }
 
@@ -293,10 +264,9 @@ class Tracker {
     void SetAnonVarName() {
         anon_var_cnt_++;
         var_name_ = "anonymous variable #" + std::to_string(anon_var_cnt_);
-        // SetAnonHistory();
     }
 
-    void SetAnonHistory() {
+    void SetHistory() {
         history_ = "<font color=\"";
         history_ += colors[(rand() % colors_cnt)];
         history_ += "\">";
@@ -304,12 +274,11 @@ class Tracker {
         history_ += " = ";
         history_ += std::to_string(object_);
         history_ += "</font>";
-        // history_ += "\n";
     }
 
-    void SetAnonHistory(const std::string& parent_history) {
+    void SetHistory(const std::string& parent_history) {
         if (parent_history == "") {
-            SetAnonHistory();
+            SetHistory();
             return;
         }
         history_ = "<font color=\"";
@@ -321,7 +290,6 @@ class Tracker {
         history_ += "] = (";
         history_ += parent_history;
         history_ += ")</font> ";
-        // history_ += "\n";
     }
 
     void SetRelativeHistory(const Tracker<T>& other) {
@@ -334,11 +302,9 @@ class Tracker {
         history_ += "] = (";
         history_ += other.history_;
         history_ += ")</font>";
-        // history_ += "\n";
     }
 
     void GraphDumpObject() {
-        // file << var_name_ << std::endl;
         // el009BBBA8 [style=filled,fillcolor="#cfe8ff",label="OOP"];
         // el0        [shape=record,label="{{<f0> phys pos:\n 0} | { <f1>prev:\n 0 | value:\n 1.#QNAN0 | <f2> next:\n 0}}"style=filled,fillcolor="#ff8080"]
         // ellog1     [shape=record,label="{{logical_pos: 0 |<f0> phys pos:\n 1} | { <f1>prev:\n 0 | value:\n 0.100000 | <f2> next:\n 2}}"]
@@ -348,8 +314,6 @@ class Tracker {
         var_str += var_name_;
         var_str += "} | { val: ";
         var_str += std::to_string(object_);
-        // var_str += " | index: ";
-        // var_str += std::to_string(index_);
         var_str += " }}\"];\n";
         GraphDumper::GetInstance() << var_str;
     }
@@ -391,17 +355,6 @@ class Tracker {
     void LogDumpCtor() {
         Logger::GetInstance() << history_ + "\n";
     }
-
-    // void LogDumpCtor(const Tracker<T>& other, bool rvalue = false) {
-    //     // std::string msg = var_name_;
-    //     // msg += " := ";
-    //     // msg += other.history_;
-    //     // if (rvalue) {
-    //     //     msg += " (by rvalue reference)";
-    //     // }
-    //     // msg += "\n";
-    //     Logger::GetInstance() << history_;
-    // }
 };
 
 #define CREATEINT(var, value) Tracker<int> var(value, std::string(#var), "");

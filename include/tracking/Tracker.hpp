@@ -1,6 +1,10 @@
-#include <string>
+#ifndef TRACKER_T_HPP
+#define TRACKER_T_HPP
 
+#include <string>
 #include "GraphDumper.hpp"
+#include "CallStackTracker.hpp"
+#include "Logger.hpp"
 
 #define GRAPH_DUMP_BINARY_OPERATOR(obj1, operator, obj2, result) \
     int interm_node = CreateIntermediateNode(#operator);         \
@@ -15,7 +19,7 @@
     int new_index = node_indexer_++;                                  \
     obj1.index_ = new_index;                                          \
     SetEdge(interm_node, obj1.index_);                                \
-    LogName();
+    GraphDumpObject();
 
 template<class T>
 class Tracker {
@@ -25,162 +29,190 @@ class Tracker {
     int index_ = 0;
     T object_;
     std::string var_name_;
+    // std::string history_;
   public:
-    Tracker<T>(const T& object) : object_(object) {
+    Tracker<T>(const T& object,) : object_(object) {
+        TRACK_CALL
         index_ = node_indexer_++;
         SetAnonVarName();
-        LogName();
+        GraphDumpObject();
     }
     Tracker<T>(T&& object)      : object_(object) {
+        TRACK_CALL
         index_ = node_indexer_++;
         SetAnonVarName();
-        LogName();
+        GraphDumpObject();
     }
 
     // Tracker<T>(T object, const std::string& var_name)        : object_(object), var_name_(var_name) {
     //     LogName();
     // }
     Tracker<T>(const T& object, const std::string& var_name) : object_(object), var_name_(var_name) {
+        TRACK_CALL
         index_ = node_indexer_++;
-        LogName();
+        GraphDumpObject();
     }
     Tracker<T>(T&& object, const std::string& var_name)      : object_(object), var_name_(var_name) {
+        TRACK_CALL
         index_ = node_indexer_++;
         // std::string log_message = "created ";
         // log_message += var_name_;
         // log_message += " that is equals half-dead (real integer) ";
         // log_message += std::to_string(object);
-        LogName();
+        GraphDumpObject();
     }
 
     Tracker<T>(const Tracker<T>& other, const std::string& var_name) : object_(other.object_), var_name_(var_name) {
+        TRACK_CALL
         index_ = node_indexer_++;
         // std::string log_message = "created ";
         // log_message += var_name_;
         // log_message += " that is equals ";
         // log_message += other.var_name_;
-        LogName();
+        GraphDumpObject();
         SetEdgeFrom(other, ":=");
     }
 
     Tracker<T>(Tracker<T>&& other, const std::string& var_name)      : object_(other.object_), var_name_(var_name) {
+        TRACK_CALL
         index_ = node_indexer_++;
         // std::string log_message = "created ";
         // log_message += var_name_;
         // log_message += " that is equals half-dead ";
         // log_message += other.var_name_;
-        LogName();
+        GraphDumpObject();
         SetEdgeFrom(other, "ctor rvalue ref");
     }
 
     Tracker<T>(const Tracker<T>& other) : object_(other.object_) {
+        TRACK_CALL
         index_ = node_indexer_++;
         SetAnonVarName();
         SetEdgeFrom(other, ":=");
-        LogName();
+        GraphDumpObject();
     }
     Tracker<T>(Tracker<T>&& other)      : object_(other.object_) {
+        TRACK_CALL
         index_ = node_indexer_++;
         SetAnonVarName();
         SetEdgeFrom(other, "ctor rvalue ref");
-        LogName();
+        GraphDumpObject();
     }
 
     Tracker<T>& operator=(const Tracker<T>& other) {
+        TRACK_CALL
         object_ = other.object_;
         GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), =, other)
         return *this;
     }
 
     Tracker<T>& operator=(Tracker<T>&& other) {
+        TRACK_CALL
         std::swap(object_, other.object_);
         GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), =, other)
         return *this;
     }
 
     bool operator<(const Tracker<T>& other) {
+        TRACK_CALL
         return object_ < other.object_;
     }
 
     bool operator>(const Tracker<T>& other) {
+        TRACK_CALL
         return object_ > other.object_;
     }
 
     bool operator<=(const Tracker<T>& other) {
+        TRACK_CALL
         return object_ <= other.object_;
     }
 
     bool operator>=(const Tracker<T>& other) {
+        TRACK_CALL
         return object_ >= other.object_;
     }
 
     bool operator==(const Tracker<T>& other) {
+        TRACK_CALL
         return object_ == other.object_;
     }
 
     Tracker<T> operator+(const Tracker<T>& other) {
+        TRACK_CALL
         Tracker<T> result(object_ + other.object_);
         GRAPH_DUMP_BINARY_OPERATOR((*this), +, other, result)
         return result;
     }
 
     Tracker<T> operator-(const Tracker<T>& other) {
+        TRACK_CALL
         Tracker<T> result(object_ - other.object_);
         GRAPH_DUMP_BINARY_OPERATOR((*this), -, other, result)
         return result;
     }
 
     Tracker<T> operator*(const Tracker<T>& other) {
+        TRACK_CALL
         Tracker<T> result(object_ * other.object_);
         GRAPH_DUMP_BINARY_OPERATOR((*this), *, other, result)
         return result;
     }
 
     Tracker<T> operator/(const Tracker<T>& other) {
+        TRACK_CALL
         Tracker<T> result(object_ / other.object_);
         GRAPH_DUMP_BINARY_OPERATOR((*this), /, other, result)
         return result;
     }
 
     Tracker<T>& operator++() {
+        TRACK_CALL
         ++object_;
         return *this;
     }
 
     Tracker<T>& operator++(int) {
+        TRACK_CALL
         object_++;
         return *this;
     }
 
     Tracker<T>& operator--() {
+        TRACK_CALL
         --object_;
         return *this;
     }
 
     Tracker<T>& operator--(int) {
+        TRACK_CALL
         object_--;
         return *this;
     }
 
     Tracker<T>& operator+=(const Tracker<T>& other) {
+        TRACK_CALL
         object_ += other.object_;
         GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), +=, other)
         return *this;
     }
 
     Tracker<T>& operator-=(const Tracker<T>& other) {
+        TRACK_CALL
         object_ -= other.object_;
         GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), -=, other)
         return *this;
     }
 
     Tracker<T>& operator*=(const Tracker<T>& other) {
+        TRACK_CALL
         object_ *= other.object_;
         GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), *=, other)
         return *this;
     }
 
     Tracker<T>& operator/=(const Tracker<T>& other) {
+        TRACK_CALL
         object_ /= other.object_;
         GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), /=, other)
         return *this;
@@ -193,7 +225,7 @@ class Tracker {
         var_name_ = "anonymous variable #" + std::to_string(anon_var_cnt_);
     }
 
-    void LogName() {
+    void GraphDumpObject() {
         // file << var_name_ << std::endl;
         // el009BBBA8 [style=filled,fillcolor="#cfe8ff",label="OOP"];
         // el0        [shape=record,label="{{<f0> phys pos:\n 0} | { <f1>prev:\n 0 | value:\n 1.#QNAN0 | <f2> next:\n 0}}"style=filled,fillcolor="#ff8080"]
@@ -209,6 +241,8 @@ class Tracker {
         var_str += " }}\"];\n";
         GraphDumper::GetInstance() << var_str;
     }
+
+    void 
 
     int CreateIntermediateNode(const std::string& label) {
         int node_index = node_indexer_++;
@@ -246,3 +280,5 @@ class Tracker {
 };
 
 #define CREATEINT(var, value) Tracker<int> var(value, std::string(#var));
+
+#endif

@@ -1,4 +1,6 @@
 #include "Tracker.hpp"
+#include "GraphDumper.hpp"
+#include "SingletonHandler.hpp"
 #include <SFML/Graphics.hpp>
 
 using MyInt = Tracker<int>;
@@ -12,15 +14,22 @@ MyInt Sub(MyInt a, MyInt b) {
 }
 
 int main() {
+    HANDLE_SINGLETONS
+
     CREATEINT(x1, 1);
-    CREATEINT(x2, 1);
-    CREATEINT(x3, 1);
-    CREATEINT(x4, 1);
+    CREATEINT(x2, 11);
+    CREATEINT(x3, 2);
+    CREATEINT(x4, 22);
 
-    MyInt summ = Add(x1 + x2, x3 + x4);
-    MyInt diff = Sub(x1 + x2, x3 + x4);
+    CREATEINT(summ1, Add(x1, x2));
+    CREATEINT(summ2, Add(x3, x4));
 
-    CREATEINT(what, summ * diff);
-    what++;
-    what += diff;
+    CREATEINT(what, summ1 * summ2);
+
+    what += 5; // implicit ctor
+
+    x3 += 7;
+
+    what /= x3;
+
 }

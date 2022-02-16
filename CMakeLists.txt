@@ -15,8 +15,11 @@ add_compile_options(
   -DLOGGING
 )
 
-set(INCLUDE_DIR include/tracker)
-set(SRC_FILES src/main.cpp)
+set(INCLUDE_DIR include
+                include/tracker
+                include/logging)
+set(SRC_FILES src/main.cpp
+              src/logging/GraphDumper.cpp)
 
 project(tracking)
 

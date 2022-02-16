@@ -19,7 +19,7 @@ Logger::~Logger() {
 Logger& Logger::GetInstance() {
     if (instance_ == nullptr) {
         instance_ = new Logger{};
-        (*instance_) << "<!DOCTYPE html>\n<html>\n<body>\n<pre>\n";
+        (*instance_) << "<!DOCTYPE html>\n<html>\n<body style=\"background-color: gray\">\n<pre>\n";
         (*instance_) << "<font color=\"blue\">log started ";
 
         time_t rawtime;

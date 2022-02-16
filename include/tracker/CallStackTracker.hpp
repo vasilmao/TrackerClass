@@ -1,6 +1,0 @@
-#ifndef CALL_STACK_TRACKER_HPP
-#define CALL_STACK_TRACKER_HPP
-
-
-
-#endif

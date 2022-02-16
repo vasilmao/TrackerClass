@@ -2,11 +2,13 @@
 #define SINGLETON_HANDLER
 
 #include "GraphDumper.hpp"
+#include "Logger.hpp"
 
 class SingletonDestroyer {
   public:
     ~SingletonDestroyer() {
         GraphDumper::Release();
+        Logger::Release();
     }
 };
 

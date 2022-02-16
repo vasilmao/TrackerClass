@@ -16,10 +16,13 @@ add_compile_options(
 )
 
 set(INCLUDE_DIR include
-                include/tracker
+                include/tracking
                 include/logging)
+
 set(SRC_FILES src/main.cpp
-              src/logging/GraphDumper.cpp)
+              src/logging/Logger.cpp
+              src/logging/GraphDumper.cpp
+              src/tracking/CallStackTracker.cpp)
 
 project(tracking)
 

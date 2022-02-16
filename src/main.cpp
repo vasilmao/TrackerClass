@@ -1,20 +1,25 @@
 #include "Tracker.hpp"
+#include "CallStackTracker.hpp"
 #include "GraphDumper.hpp"
+#include "Logger.hpp"
 #include "SingletonHandler.hpp"
 #include <SFML/Graphics.hpp>
 
 using MyInt = Tracker<int>;
 
 MyInt Add(MyInt a, MyInt b) {
+    TRACK_CALL
     return a + b;
 }
 
 MyInt Sub(MyInt a, MyInt b) {
+    TRACK_CALL
     return a - b;
 }
 
 int main() {
     HANDLE_SINGLETONS
+    TRACK_CALL
 
     CREATEINT(x1, 1);
     CREATEINT(x2, 11);

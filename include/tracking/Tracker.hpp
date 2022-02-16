@@ -301,8 +301,9 @@ class Tracker {
         history_ += colors[(rand() % colors_cnt)];
         history_ += "\">";
         history_ += var_name_;
-        history_ += "</font> = ";
+        history_ += " = ";
         history_ += std::to_string(object_);
+        history_ += "</font>";
         // history_ += "\n";
     }
 
@@ -315,11 +316,11 @@ class Tracker {
         history_ += colors[(rand() % colors_cnt)];
         history_ += "\">";
         history_ += var_name_;
-        history_ += "</font> [";
+        history_ += "[";
         history_ += std::to_string(object_);
         history_ += "] = (";
         history_ += parent_history;
-        history_ += ")";
+        history_ += ")</font> ";
         // history_ += "\n";
     }
 
@@ -328,11 +329,11 @@ class Tracker {
         history_ += colors[(rand() % colors_cnt)];
         history_ += "\">";
         history_ += var_name_;
-        history_ += "</font> [";
+        history_ += " [";
         history_ += std::to_string(object_);
         history_ += "] = (";
         history_ += other.history_;
-        history_ += ")";
+        history_ += ")</font>";
         // history_ += "\n";
     }
 

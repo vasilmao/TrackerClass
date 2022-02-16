@@ -31,7 +31,7 @@ class Tracker {
     std::string var_name_;
     // std::string history_;
   public:
-    Tracker<T>(const T& object,) : object_(object) {
+    Tracker<T>(const T& object) : object_(object) {
         TRACK_CALL
         index_ = node_indexer_++;
         SetAnonVarName();
@@ -241,8 +241,6 @@ class Tracker {
         var_str += " }}\"];\n";
         GraphDumper::GetInstance() << var_str;
     }
-
-    void 
 
     int CreateIntermediateNode(const std::string& label) {
         int node_index = node_indexer_++;

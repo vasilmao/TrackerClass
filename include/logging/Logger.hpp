@@ -22,7 +22,7 @@ class Logger { // singleton
     static void RemoveTab();
 
     Logger& operator<<(const std::string& str) {
-        file_ << std::string(tabs_cnt_, '\t') << str;
+        file_ << std::string(tabs_cnt_ * 4, ' ') << str;
         return *this;
     }
 };

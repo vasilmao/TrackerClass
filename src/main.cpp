@@ -3,7 +3,6 @@
 #include "GraphDumper.hpp"
 #include "Logger.hpp"
 #include "SingletonHandler.hpp"
-#include <SFML/Graphics.hpp>
 
 using MyInt = Tracker<int>;
 

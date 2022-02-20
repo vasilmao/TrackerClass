@@ -13,6 +13,7 @@ add_compile_options(
   -Wextra
   -Wpedantic
   -DLOGGING
+  -fno-elide-constructors
 )
 
 set(INCLUDE_DIR include

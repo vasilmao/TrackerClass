@@ -12,7 +12,6 @@
     SetEdge(obj2.index_, interm_node);                           \
     SetEdge(interm_node, result.index_);
 
-#define LOG_DUMP_BINARY_OPERATOR(obj1, operator, obj2, result)   \
 
 
 #define GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR(obj1, operator, obj2) \
@@ -46,14 +45,14 @@ class Tracker {
         GraphDumpObject();
         LogDumpCtor();
     }
-    Tracker<T>(T&& object, const std::string& parent_history="")      : object_(object) {
-        TRACK_CALL
-        index_ = node_indexer_++;
-        SetAnonVarName();
-        SetHistory(parent_history);
-        GraphDumpObject();
-        LogDumpCtor();
-    }
+    // Tracker<T>(T&& object, const std::string& parent_history="")      : object_(object) {
+    //     TRACK_CALL
+    //     index_ = node_indexer_++;
+    //     SetAnonVarName();
+    //     SetHistory(parent_history);
+    //     GraphDumpObject();
+    //     LogDumpCtor();
+    // }
 
     // Tracker<T>(T object, const std::string& var_name)        : object_(object), var_name_(var_name) {
     //     LogName();
@@ -70,18 +69,18 @@ class Tracker {
         SetHistory(parent_history);
         LogDumpCtor();
     }
-    Tracker<T>(T&& object, const std::string& var_name, const std::string& parent_history)      : object_(object) {
-        TRACK_CALL
-        index_ = node_indexer_++;
-        GraphDumpObject();
-        if (var_name.length() == 0) {
-            SetAnonVarName();
-        } else {
-            var_name_ = var_name;
-        }
-        SetHistory(parent_history);
-        LogDumpCtor();
-    }
+    // Tracker<T>(T&& object, const std::string& var_name, const std::string& parent_history)      : object_(object) {
+    //     TRACK_CALL
+    //     index_ = node_indexer_++;
+    //     GraphDumpObject();
+    //     if (var_name.length() == 0) {
+    //         SetAnonVarName();
+    //     } else {
+    //         var_name_ = var_name;
+    //     }
+    //     SetHistory(parent_history);
+    //     LogDumpCtor();
+    // }
 
     Tracker<T>(const Tracker<T>& other, const std::string& var_name, const std::string&) : object_(other.object_), var_name_(var_name) {
         TRACK_CALL
@@ -92,33 +91,33 @@ class Tracker {
         LogDumpCtor();
     }
 
-    Tracker<T>(Tracker<T>&& other, const std::string& var_name, const std::string&)      : object_(other.object_), var_name_(var_name) {
-        TRACK_CALL
-        index_ = node_indexer_++;
-        GraphDumpObject();
-        SetEdgeFrom(other, "ctor rvalue ref");
-        SetRelativeHistory(other);
-        LogDumpCtor();
-    }
+    // Tracker<T>(Tracker<T>&& other, const std::string& var_name, const std::string&)      : object_(other.object_), var_name_(var_name) {
+    //     TRACK_CALL
+    //     index_ = node_indexer_++;
+    //     GraphDumpObject();
+    //     SetEdgeFrom(other, "ctor rvalue ref");
+    //     SetRelativeHistory(other);
+    //     LogDumpCtor();
+    // }
 
     Tracker<T>(const Tracker<T>& other) : object_(other.object_) {
         TRACK_CALL
         index_ = node_indexer_++;
         SetAnonVarName();
-        SetHistory();
+        SetRelativeHistory(other);
         SetEdgeFrom(other, ":=");
         GraphDumpObject();
         LogDumpCtor();
     }
-    Tracker<T>(Tracker<T>&& other)      : object_(other.object_) {
-        TRACK_CALL
-        index_ = node_indexer_++;
-        SetAnonVarName();
-        SetEdgeFrom(other, "ctor rvalue ref");
-        GraphDumpObject();
-        SetRelativeHistory(other);
-        LogDumpCtor();
-    }
+    // Tracker<T>(Tracker<T>&& other)      : object_(other.object_) {
+    //     TRACK_CALL
+    //     index_ = node_indexer_++;
+    //     SetAnonVarName();
+    //     SetEdgeFrom(other, "ctor rvalue ref");
+    //     GraphDumpObject();
+    //     SetRelativeHistory(other);
+    //     LogDumpCtor();
+    // }
 
     Tracker<T>& operator=(const Tracker<T>& other) {
         TRACK_CALL
@@ -263,7 +262,7 @@ class Tracker {
     
     void SetAnonVarName() {
         anon_var_cnt_++;
-        var_name_ = "anonymous variable #" + std::to_string(anon_var_cnt_);
+        var_name_ = "ANON #" + std::to_string(anon_var_cnt_);
     }
 
     void SetHistory() {

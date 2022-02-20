@@ -57,12 +57,12 @@ class Tracker {
     Tracker<T>(const T& object, const std::string& var_name, const std::string& parent_history) : object_(object) {
         TRACK_CALL
         index_ = node_indexer_++;
-        GraphDumpObject();
         if (var_name.length() == 0) {
             SetAnonVarName();
         } else {
             var_name_ = var_name;
         }
+        GraphDumpObject();
         SetHistory(parent_history);
         LogDumpCtor();
     }
@@ -70,12 +70,12 @@ class Tracker {
     Tracker<T>(T&& object, const std::string& var_name, const std::string& parent_history)      : object_(object) {
         TRACK_CALL
         index_ = node_indexer_++;
-        GraphDumpObject();
         if (var_name.length() == 0) {
             SetAnonVarName();
         } else {
             var_name_ = var_name;
         }
+        GraphDumpObject();
         SetHistory(parent_history);
         LogDumpCtor();
     }
@@ -84,7 +84,7 @@ class Tracker {
         TRACK_CALL
         index_ = node_indexer_++;
         GraphDumpObject();
-        SetEdgeFrom(other, ":=");
+        SetEdgeFrom(other, ":=", "red");
         SetHistory();
         LogDumpCtor();
     }
@@ -93,7 +93,7 @@ class Tracker {
         TRACK_CALL
         index_ = node_indexer_++;
         GraphDumpObject();
-        SetEdgeFrom(other, "ctor rvalue ref");
+        SetEdgeFrom(other, "move", "green");
         SetRelativeHistory(other);
         LogDumpCtor();
     }
@@ -103,7 +103,7 @@ class Tracker {
         index_ = node_indexer_++;
         SetAnonVarName();
         SetRelativeHistory(other);
-        SetEdgeFrom(other, ":=");
+        SetEdgeFrom(other, ":=", "red");
         GraphDumpObject();
         LogDumpCtor();
     }
@@ -112,7 +112,7 @@ class Tracker {
         TRACK_CALL
         index_ = node_indexer_++;
         SetAnonVarName();
-        SetEdgeFrom(other, "ctor rvalue ref");
+        SetEdgeFrom(other, "move", "green");
         GraphDumpObject();
         SetRelativeHistory(other);
         LogDumpCtor();
@@ -327,27 +327,29 @@ class Tracker {
         return node_index;
     }
 
-    void SetEdge(int from, int to, const std::string& label = "") {
+    void SetEdge(int from, int to, const std::string& label = "", const std::string& color = "black") {
         std::string message = "\tel";
         message += std::to_string(from);
         message += " -> el";
         message += std::to_string(to);
         message += " [label=\"";
         message += label;
+        message += "\",color=\"";
+        message += color;
         message += "\"];\n";
         GraphDumper::GetInstance() << message;
     }
 
-    void SetEdge(const Tracker<T>& from, const Tracker<T>& to, const std::string& label = "") {
-        SetEdge(from.index_, to.index_, label);
+    void SetEdge(const Tracker<T>& from, const Tracker<T>& to, const std::string& label = "", const std::string& color = "black") {
+        SetEdge(from.index_, to.index_, label, color);
     }
 
-    void SetEdgeFrom(const Tracker<T>& other, const std::string& label = "") {
-        SetEdge(other, *this, label);
+    void SetEdgeFrom(const Tracker<T>& other, const std::string& label = "", const std::string& color = "black") {
+        SetEdge(other, *this, label, color);
     }
 
-    void SetEdgeTo(const Tracker<T>& other, const std::string& label = "") {
-        SetEdge(*this, other, label);
+    void SetEdgeTo(const Tracker<T>& other, const std::string& label = "", const std::string& color = "black") {
+        SetEdge(*this, other, label, color);
     }
 
     void LogDumpCtor() {

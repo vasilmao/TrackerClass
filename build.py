@@ -3,7 +3,10 @@ import subprocess
 
 ban_list = [".git", ".vscode", ".vs", "obj", "bin"]
 LXX_FLAGS = ""
-CXX_FLAGS = "-fno-elide-constructors"
+CXX_FLAGS = "\
+    -std=c++17\
+    -fno-elide-constructors\
+    "
 OUT_FILENAME = "kek.out"
 
 def get_dirs_rec(start_dir):

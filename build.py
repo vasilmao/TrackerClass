@@ -2,6 +2,9 @@ import os
 import subprocess
 
 ban_list = [".git", ".vscode", ".vs", "obj", "bin"]
+LXX_FLAGS = ""
+CXX_FLAGS = "-fno-elide-constructors"
+OUT_FILENAME = "kek.out"
 
 def get_dirs_rec(start_dir):
     ans = [start_dir]
@@ -63,13 +66,13 @@ makefile_content = ""
 # spawn main target
 
 print("creating main target...")
-makefile_content += "kek.out: "
+makefile_content += OUT_FILENAME + ": Makefile "
 for cpp_file in srcs:
     filename_without_path = os.path.split(cpp_file)[-1]
     makefile_content += filename_without_path
     makefile_content += ".o "
 
-makefile_content += "\n\tg++ -o bin/kek.out "
+makefile_content += "\n\tg++ " + LXX_FLAGS + " -o bin/" + OUT_FILENAME + " "
 
 
 for cpp_file in srcs:
@@ -89,10 +92,11 @@ cnt = 0
 for cpp_file in srcs:
     filename_without_path = os.path.split(cpp_file)[-1]
     make_rule = subprocess.run(["g++", "-MM", "-MT", filename_without_path + ".o"] + cxx_include_argument + [cpp_file], stdout=subprocess.PIPE).stdout.decode("utf-8")
+    make_rule = make_rule.rstrip() + " Makefile"
     makefile_content += make_rule
-    makefile_content += "\t"
+    makefile_content += "\n\t"
     filename_without_path = os.path.split(cpp_file)[-1]
-    makefile_content += "g++ " + " ".join(cxx_include_argument) + " -c " + cpp_file + " -o obj/" + filename_without_path + ".o\n\n"
+    makefile_content += "g++ " + " ".join(cxx_include_argument) + " " + CXX_FLAGS + " -c " + cpp_file + " -o obj/" + filename_without_path + ".o\n\n"
     cnt += 1
     print(cnt, "of", len(srcs))
 

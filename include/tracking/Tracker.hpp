@@ -45,18 +45,15 @@ class Tracker {
         GraphDumpObject();
         LogDumpCtor();
     }
-    // Tracker<T>(T&& object, const std::string& parent_history="")      : object_(object) {
-    //     TRACK_CALL
-    //     index_ = node_indexer_++;
-    //     SetAnonVarName();
-    //     SetHistory(parent_history);
-    //     GraphDumpObject();
-    //     LogDumpCtor();
-    // }
+    Tracker<T>(T&& object, const std::string& parent_history="")      : object_(object) {
+        TRACK_CALL
+        index_ = node_indexer_++;
+        SetAnonVarName();
+        SetHistory(parent_history);
+        GraphDumpObject();
+        LogDumpCtor();
+    }
 
-    // Tracker<T>(T object, const std::string& var_name)        : object_(object), var_name_(var_name) {
-    //     LogName();
-    // }
     Tracker<T>(const T& object, const std::string& var_name, const std::string& parent_history) : object_(object) {
         TRACK_CALL
         index_ = node_indexer_++;
@@ -69,18 +66,19 @@ class Tracker {
         SetHistory(parent_history);
         LogDumpCtor();
     }
-    // Tracker<T>(T&& object, const std::string& var_name, const std::string& parent_history)      : object_(object) {
-    //     TRACK_CALL
-    //     index_ = node_indexer_++;
-    //     GraphDumpObject();
-    //     if (var_name.length() == 0) {
-    //         SetAnonVarName();
-    //     } else {
-    //         var_name_ = var_name;
-    //     }
-    //     SetHistory(parent_history);
-    //     LogDumpCtor();
-    // }
+
+    Tracker<T>(T&& object, const std::string& var_name, const std::string& parent_history)      : object_(object) {
+        TRACK_CALL
+        index_ = node_indexer_++;
+        GraphDumpObject();
+        if (var_name.length() == 0) {
+            SetAnonVarName();
+        } else {
+            var_name_ = var_name;
+        }
+        SetHistory(parent_history);
+        LogDumpCtor();
+    }
 
     Tracker<T>(const Tracker<T>& other, const std::string& var_name, const std::string&) : object_(other.object_), var_name_(var_name) {
         TRACK_CALL
@@ -91,14 +89,14 @@ class Tracker {
         LogDumpCtor();
     }
 
-    // Tracker<T>(Tracker<T>&& other, const std::string& var_name, const std::string&)      : object_(other.object_), var_name_(var_name) {
-    //     TRACK_CALL
-    //     index_ = node_indexer_++;
-    //     GraphDumpObject();
-    //     SetEdgeFrom(other, "ctor rvalue ref");
-    //     SetRelativeHistory(other);
-    //     LogDumpCtor();
-    // }
+    Tracker<T>(Tracker<T>&& other, const std::string& var_name, const std::string&)      : object_(other.object_), var_name_(var_name) {
+        TRACK_CALL
+        index_ = node_indexer_++;
+        GraphDumpObject();
+        SetEdgeFrom(other, "ctor rvalue ref");
+        SetRelativeHistory(other);
+        LogDumpCtor();
+    }
 
     Tracker<T>(const Tracker<T>& other) : object_(other.object_) {
         TRACK_CALL
@@ -109,15 +107,16 @@ class Tracker {
         GraphDumpObject();
         LogDumpCtor();
     }
-    // Tracker<T>(Tracker<T>&& other)      : object_(other.object_) {
-    //     TRACK_CALL
-    //     index_ = node_indexer_++;
-    //     SetAnonVarName();
-    //     SetEdgeFrom(other, "ctor rvalue ref");
-    //     GraphDumpObject();
-    //     SetRelativeHistory(other);
-    //     LogDumpCtor();
-    // }
+
+    Tracker<T>(Tracker<T>&& other)      : object_(other.object_) {
+        TRACK_CALL
+        index_ = node_indexer_++;
+        SetAnonVarName();
+        SetEdgeFrom(other, "ctor rvalue ref");
+        GraphDumpObject();
+        SetRelativeHistory(other);
+        LogDumpCtor();
+    }
 
     Tracker<T>& operator=(const Tracker<T>& other) {
         TRACK_CALL

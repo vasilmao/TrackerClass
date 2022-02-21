@@ -1,12 +1,14 @@
+#!/usr/bin/env python3
+
 import os
 import subprocess
 
 ban_list = [".git", ".vscode", ".vs", "obj", "bin"]
-LXX_FLAGS = ""
-CXX_FLAGS = "\
-    -std=c++17\
-    -fno-elide-constructors\
-    "
+LXX_FLAGS = []
+CXX_FLAGS = [
+    "-std=c++17",
+    "-fno-elide-constructors",
+    ]
 OUT_FILENAME = "kek.out"
 
 def get_dirs_rec(start_dir):
@@ -75,7 +77,7 @@ for cpp_file in srcs:
     makefile_content += filename_without_path
     makefile_content += ".o "
 
-makefile_content += "\n\tg++ " + LXX_FLAGS + " -o bin/" + OUT_FILENAME + " "
+makefile_content += "\n\tg++ " + " ".join(LXX_FLAGS) + " -o bin/" + OUT_FILENAME + " "
 
 
 for cpp_file in srcs:
@@ -99,7 +101,7 @@ for cpp_file in srcs:
     makefile_content += make_rule
     makefile_content += "\n\t"
     filename_without_path = os.path.split(cpp_file)[-1]
-    makefile_content += "g++ " + " ".join(cxx_include_argument) + " " + CXX_FLAGS + " -c " + cpp_file + " -o obj/" + filename_without_path + ".o\n\n"
+    makefile_content += "g++ " + " ".join(cxx_include_argument) + " " + " ".join(CXX_FLAGS) + " -c " + cpp_file + " -o obj/" + filename_without_path + ".o\n\n"
     cnt += 1
     print(cnt, "of", len(srcs))
 

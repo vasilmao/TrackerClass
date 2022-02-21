@@ -11,11 +11,6 @@ MyInt Add(MyInt a, MyInt b) {
     return a + b;
 }
 
-MyInt Sub(MyInt a, MyInt b) {
-    TRACK_CALL
-    return a - b;
-}
-
 int main() {
     HANDLE_SINGLETONS
     TRACK_CALL

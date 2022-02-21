@@ -84,7 +84,7 @@ class Tracker {
         TRACK_CALL
         index_ = node_indexer_++;
         GraphDumpObject();
-        SetEdgeFrom(other, ":=", "red");
+        SetEdgeFrom(other, "COPY", "red", "bold");
         SetHistory();
         LogDumpCtor();
     }
@@ -103,7 +103,7 @@ class Tracker {
         index_ = node_indexer_++;
         SetAnonVarName();
         SetRelativeHistory(other);
-        SetEdgeFrom(other, ":=", "red");
+        SetEdgeFrom(other, "COPY", "red", "bold");
         GraphDumpObject();
         LogDumpCtor();
     }
@@ -312,7 +312,12 @@ class Tracker {
         var_str += var_name_;
         var_str += "} | { val: ";
         var_str += std::to_string(object_);
-        var_str += " }}\"];\n";
+        // var_str += " }}\"];\n";
+        var_str += " }}\"";
+        if (var_name_.compare(0, 6, "ANON #") == 0) {
+            var_str += ",style=filled,fillcolor=\"red\"";
+        }
+        var_str += "];\n";
         GraphDumper::GetInstance() << var_str;
     }
 
@@ -327,7 +332,7 @@ class Tracker {
         return node_index;
     }
 
-    void SetEdge(int from, int to, const std::string& label = "", const std::string& color = "black") {
+    void SetEdge(int from, int to, const std::string& label = "", const std::string& color = "black", const std::string& style = "") {
         std::string message = "\tel";
         message += std::to_string(from);
         message += " -> el";
@@ -336,20 +341,22 @@ class Tracker {
         message += label;
         message += "\",color=\"";
         message += color;
+        message += "\",style=\"";
+        message += style;
         message += "\"];\n";
         GraphDumper::GetInstance() << message;
     }
 
-    void SetEdge(const Tracker<T>& from, const Tracker<T>& to, const std::string& label = "", const std::string& color = "black") {
-        SetEdge(from.index_, to.index_, label, color);
+    void SetEdge(const Tracker<T>& from, const Tracker<T>& to, const std::string& label = "", const std::string& color = "black", const std::string& style = "") {
+        SetEdge(from.index_, to.index_, label, color, style);
     }
 
-    void SetEdgeFrom(const Tracker<T>& other, const std::string& label = "", const std::string& color = "black") {
-        SetEdge(other, *this, label, color);
+    void SetEdgeFrom(const Tracker<T>& other, const std::string& label = "", const std::string& color = "black", const std::string& style = "") {
+        SetEdge(other, *this, label, color, style);
     }
 
-    void SetEdgeTo(const Tracker<T>& other, const std::string& label = "", const std::string& color = "black") {
-        SetEdge(*this, other, label, color);
+    void SetEdgeTo(const Tracker<T>& other, const std::string& label = "", const std::string& color = "black", const std::string& style = "") {
+        SetEdge(*this, other, label, color, style);
     }
 
     void LogDumpCtor() {

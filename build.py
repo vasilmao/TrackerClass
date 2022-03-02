@@ -3,13 +3,19 @@
 import os
 import subprocess
 
-ban_list = [".git", ".vscode", ".vs", "obj", "bin"]
+BIN_DIR = "bin"
+OBJ_DIR = "obj"
+
+
+ban_list = [".git", ".vscode", ".vs", OBJ_DIR, BIN_DIR, "targets"]
 LXX_FLAGS = []
 CXX_FLAGS = [
     "-std=c++17",
-    "-fno-elide-constructors",
+    # "-fno-elide-constructors",
     ]
-OUT_FILENAME = "kek.out"
+
+CXX = "g++"
+
 
 def get_dirs_rec(start_dir):
     ans = [start_dir]
@@ -31,16 +37,16 @@ def get_src_rec(start_dir):
             ans += get_src_rec(candidate)
         elif (os.path.isfile(candidate)):
             if candidate.endswith(".cpp"):
-                ans.append(candidate)
+                ans.append(candidate[:candidate.rfind(".")])
     return ans
 
 
 
-if not os.path.exists("obj"):
-    os.mkdir("obj")
+if not os.path.exists(OBJ_DIR):
+    os.mkdir(OBJ_DIR)
 
-if not os.path.exists("bin"):
-    os.mkdir("bin")
+if not os.path.exists(BIN_DIR):
+    os.mkdir(BIN_DIR)
 
 
 print("getting directories...")
@@ -68,26 +74,41 @@ print("list of .cpp files created")
 
 makefile_content = ""
 
-# spawn main target
 
-print("creating main target...")
-makefile_content += OUT_FILENAME + ": Makefile "
-for cpp_file in srcs:
-    filename_without_path = os.path.split(cpp_file)[-1]
-    makefile_content += filename_without_path
-    makefile_content += ".o "
+# spawn main targets
 
-makefile_content += "\n\tg++ " + " ".join(LXX_FLAGS) + " -o bin/" + OUT_FILENAME + " "
+targets_list = []
 
+for file in os.listdir(os.path.join(os.path.curdir, "targets")):
+    print("target file:", file)
+    file_name_without_extension = file[:file.rfind(".")]
+    target_file = os.path.join(os.path.curdir, "targets", file_name_without_extension)
+    if (os.path.isfile(target_file + ".cpp")):
+        targets_list.append(target_file)
 
-for cpp_file in srcs:
-    filename_without_path = os.path.split(cpp_file)[-1]
-    makefile_content += "obj/" + filename_without_path
-    makefile_content += ".o "
+        out_filename = BIN_DIR + "/" + file_name_without_extension + ".out"
+        makefile_content += out_filename + ": Makefile "
+        makefile_content += OBJ_DIR + "/" + file_name_without_extension + ".o "
+        for cpp_file in srcs:
+            filename_without_path = os.path.split(cpp_file)[-1]
+            makefile_content += OBJ_DIR + "/" + filename_without_path
+            makefile_content += ".o "
 
-makefile_content += "\n\n"
+        # makefile_content += "\n\t" + CXX + " " + " ".join(LXX_FLAGS) + " -o "  + out_filename + " "
+        makefile_content += "\n\t" + CXX + (" " + " ".join(LXX_FLAGS) if len(LXX_FLAGS) != 0 else "")+ " -o " + out_filename + " "
+
+        makefile_content += OBJ_DIR + "/" + file_name_without_extension + ".o "
+
+        for cpp_file in srcs:
+            filename_without_path = os.path.split(cpp_file)[-1]
+            makefile_content += OBJ_DIR + "/" + filename_without_path
+            makefile_content += ".o "
+        print("target spawned", file)
+        makefile_content += "\n\n"
 
 print("main target created")
+
+srcs += targets_list
 
 # spawn targets for object files
 
@@ -95,13 +116,14 @@ print("creating make targets for .o ...")
 
 cnt = 0
 for cpp_file in srcs:
-    filename_without_path = os.path.split(cpp_file)[-1]
-    make_rule = subprocess.run(["g++", "-MM", "-MT", filename_without_path + ".o"] + cxx_include_argument + [cpp_file], stdout=subprocess.PIPE).stdout.decode("utf-8")
+    filename_without_path = os.path.join(OBJ_DIR, os.path.split(cpp_file)[-1])
+    # filename_without_path = cpp_file
+    make_rule = subprocess.run([CXX, "-MM", "-MT", filename_without_path + ".o"] + cxx_include_argument + [cpp_file + ".cpp"], stdout=subprocess.PIPE).stdout.decode("utf-8")
     make_rule = make_rule.rstrip() + " Makefile"
     makefile_content += make_rule
     makefile_content += "\n\t"
     filename_without_path = os.path.split(cpp_file)[-1]
-    makefile_content += "g++ " + " ".join(cxx_include_argument) + " " + " ".join(CXX_FLAGS) + " -c " + cpp_file + " -o obj/" + filename_without_path + ".o\n\n"
+    makefile_content += CXX + " " + " ".join(cxx_include_argument) + " " + " ".join(CXX_FLAGS) + " -c " + cpp_file + ".cpp -o " + OBJ_DIR + "/" + filename_without_path + ".o\n\n"
     cnt += 1
     print(cnt, "of", len(srcs))
 

@@ -23,6 +23,24 @@
     SetEdge(interm_node, obj1.index_);                                \
     GraphDumpObject();
 
+#define GRAPH_DUMP_ASSIGNMENT_COPY_OPERATOR(obj1, operator, obj2)        \
+    int interm_node = CreateIntermediateNode(#operator);                 \
+    SetEdge(obj1.index_, interm_node, "left operand");                   \
+    SetEdge(obj2.index_, interm_node, "right operand (COPY!!!)", "red"); \
+    int new_index = node_indexer_++;                                     \
+    obj1.index_ = new_index;                                             \
+    SetEdge(interm_node, obj1.index_);                                   \
+    GraphDumpObject();
+
+#define GRAPH_DUMP_ASSIGNMENT_MOVE_OPERATOR(obj1, operator, obj2)        \
+    int interm_node = CreateIntermediateNode(#operator);                 \
+    SetEdge(obj1.index_, interm_node, "left operand");                   \
+    SetEdge(obj2.index_, interm_node, "right operand (move)", "green");  \
+    int new_index = node_indexer_++;                                     \
+    obj1.index_ = new_index;                                             \
+    SetEdge(interm_node, obj1.index_);                                   \
+    GraphDumpObject();
+
 const int colors_cnt = 9;
 const std::string colors[colors_cnt] = {"red", "cyan", "blue", "darkblue", "lightblue", "purple", "lime", "magenta", "pink"};
 
@@ -45,8 +63,9 @@ class Tracker {
         GraphDumpObject();
         LogDumpCtor();
     }
-    Tracker<T>(T&& object, const std::string& parent_history="")      : object_(object) {
+    Tracker<T>(T&& object, const std::string& parent_history="") {
         TRACK_CALL
+        std::swap(object_, object);
         index_ = node_indexer_++;
         SetAnonVarName();
         SetHistory(parent_history);
@@ -67,8 +86,9 @@ class Tracker {
         LogDumpCtor();
     }
 
-    Tracker<T>(T&& object, const std::string& var_name, const std::string& parent_history)      : object_(object) {
+    Tracker<T>(T&& object, const std::string& var_name, const std::string& parent_history) {
         TRACK_CALL
+        std::swap(object, object_);
         index_ = node_indexer_++;
         if (var_name.length() == 0) {
             SetAnonVarName();
@@ -89,8 +109,9 @@ class Tracker {
         LogDumpCtor();
     }
 
-    Tracker<T>(Tracker<T>&& other, const std::string& var_name, const std::string&)      : object_(other.object_), var_name_(var_name) {
+    Tracker<T>(Tracker<T>&& other, const std::string& var_name, const std::string&)      : var_name_(var_name) {
         TRACK_CALL
+        std::swap(object_, other.object_);
         index_ = node_indexer_++;
         GraphDumpObject();
         SetEdgeFrom(other, "move", "green");
@@ -108,8 +129,9 @@ class Tracker {
         LogDumpCtor();
     }
 
-    Tracker<T>(Tracker<T>&& other)      : object_(other.object_) {
+    Tracker<T>(Tracker<T>&& other) {
         TRACK_CALL
+        std::swap(object_, other.object_);
         index_ = node_indexer_++;
         SetAnonVarName();
         SetEdgeFrom(other, "move", "green");
@@ -121,14 +143,16 @@ class Tracker {
     Tracker<T>& operator=(const Tracker<T>& other) {
         TRACK_CALL
         object_ = other.object_;
-        GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), =, other)
+        GRAPH_DUMP_ASSIGNMENT_COPY_OPERATOR((*this), =, other)
+        // GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), =, other)
         return *this;
     }
 
     Tracker<T>& operator=(Tracker<T>&& other) {
         TRACK_CALL
         std::swap(object_, other.object_);
-        GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), =, other)
+        GRAPH_DUMP_ASSIGNMENT_MOVE_OPERATOR((*this), =, other)
+        // GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), =, other)
         return *this;
     }
 

@@ -1,5 +1,4 @@
 #include "Tracker.hpp"
-#include "CallStackTracker.hpp"
 #include "GraphDumper.hpp"
 #include "Logger.hpp"
 #include "SingletonHandler.hpp"
@@ -18,6 +17,8 @@ int main() {
     CREATEINT(x1, 1);
     CREATEINT(x2, 11);
     CREATEINT(x3, 2);
+
+    
     CREATEINT(x4, 22);
 
     CREATEINT(summ1, Add(x1, x2));
@@ -29,6 +30,6 @@ int main() {
 
     x3 += 7;
 
-    what /= x3;
+    what = x3;
 
 }

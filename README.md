@@ -17,6 +17,7 @@ the slow version:
 the "fast" version:
 ![fast_swap](https://user-images.githubusercontent.com/34096563/157378883-8a33cbd3-9935-4e49-8a52-4a4d8ab0f50a.svg)
 
+potomushto dora dura superdura dora dura...
 
 ## example2.cpp
 This is the example of wrong move usage and how forward fixes it

@@ -6,8 +6,6 @@
 #include "CallStackTracker.hpp"
 #include "Logger.hpp"
 
-int TRACKER_COUNTER = 0;
-
 #define GRAPH_DUMP_BINARY_OPERATOR(obj1, operator, obj2, result) \
     int interm_node = CreateIntermediateNode(#operator);         \
     SetEdge(obj1.index_, interm_node);                           \
@@ -59,8 +57,8 @@ class Tracker {
 
     Tracker<T>(const T& object, const std::string& parent_history="") : object_(object) {
         TRACK_CALL
-        // index_ = node_indexer_++;
-        index_ = TRACKER_COUNTER++;
+        index_ = node_indexer_++;
+        // index_ = TRACKER_COUNTER++;
         SetAnonVarName();
         SetHistory(parent_history);
         GraphDumpObject();
@@ -69,8 +67,8 @@ class Tracker {
     Tracker<T>(T&& object, const std::string& parent_history="") {
         TRACK_CALL
         std::swap(object_, object);
-        // index_ = node_indexer_++;
-        index_ = TRACKER_COUNTER++;
+        index_ = node_indexer_++;
+        // index_ = TRACKER_COUNTER++;
         SetAnonVarName();
         SetHistory(parent_history);
         GraphDumpObject();
@@ -79,8 +77,8 @@ class Tracker {
 
     Tracker<T>(const T& object, const std::string& var_name, const std::string& parent_history) : object_(object) {
         TRACK_CALL
-        // index_ = node_indexer_++;
-        index_ = TRACKER_COUNTER++;
+        index_ = node_indexer_++;
+        // index_ = TRACKER_COUNTER++;
         if (var_name.length() == 0) {
             SetAnonVarName();
         } else {
@@ -101,8 +99,8 @@ class Tracker {
         // std::cout << "other: " << std::to_string(object) << std::endl;
         // std::cout << "my: " << std::to_string(object_) << std::endl;
         // std::cout << "d\n";
-        // index_ = node_indexer_++;
-        index_ = TRACKER_COUNTER++;
+        index_ = node_indexer_++;
+        // index_ = TRACKER_COUNTER++;
         if (var_name.length() == 0) {
             SetAnonVarName();
         } else {
@@ -116,8 +114,8 @@ class Tracker {
 
     Tracker<T>(const Tracker<T>& other, const std::string& var_name, const std::string&) : object_(other.object_), var_name_(var_name) {
         TRACK_CALL
-        // index_ = node_indexer_++;
-        index_ = TRACKER_COUNTER++;
+        index_ = node_indexer_++;
+        // index_ = TRACKER_COUNTER++;
         GraphDumpObject();
         SetEdgeFrom(other, "COPY", "red", "bold");
         SetHistory();
@@ -127,8 +125,8 @@ class Tracker {
     Tracker<T>(Tracker<T>&& other, const std::string& var_name, const std::string&)      : var_name_(var_name) {
         TRACK_CALL
         std::swap(object_, other.object_);
-        // index_ = node_indexer_++;
-        index_ = TRACKER_COUNTER++;
+        index_ = node_indexer_++;
+        // index_ = TRACKER_COUNTER++;
         GraphDumpObject();
         SetEdgeFrom(other, "move", "green");
         SetRelativeHistory(other);
@@ -137,8 +135,8 @@ class Tracker {
 
     Tracker<T>(const Tracker<T>& other) : object_(other.object_) {
         TRACK_CALL
-        // index_ = node_indexer_++;
-        index_ = TRACKER_COUNTER++;
+        index_ = node_indexer_++;
+        // index_ = TRACKER_COUNTER++;
         SetAnonVarName();
         SetRelativeHistory(other);
         SetEdgeFrom(other, "COPY", "red", "bold");
@@ -149,8 +147,8 @@ class Tracker {
     Tracker<T>(Tracker<T>&& other) {
         TRACK_CALL
         std::swap(object_, other.object_);
-        // index_ = node_indexer_++;
-        index_ = TRACKER_COUNTER++;
+        index_ = node_indexer_++;
+        // index_ = TRACKER_COUNTER++;
         SetAnonVarName();
         SetEdgeFrom(other, "move", "green");
         GraphDumpObject();
@@ -369,8 +367,8 @@ class Tracker {
     }
 
     int CreateIntermediateNode(const std::string& label) {
-        // int node_index = node_indexer_++;
-        int node_index = TRACKER_COUNTER++;
+        int node_index = node_indexer_++;
+        // int node_index = TRACKER_COUNTER++;
         std::string node_str = "\tel";
         node_str += std::to_string(node_index);
         node_str += " [style=filled,fillcolor=\"#cfe8ff\",label=\"";

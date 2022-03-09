@@ -7,6 +7,7 @@ main.cpp: just example of tracker usage, see the log.html. To see graph use grap
 ```
 dot -Tsvg graph.txt > graph
 ```
+![slow_swap](https://user-images.githubusercontent.com/34096563/157378743-78fd316d-2243-4d7d-9b53-a086d1b46de9.svg)
 
 ## example1.cpp
 This just shows how move can be used to speed up the programm. On the graph you can see red arrows of copying and green arrows of moving.

@@ -166,14 +166,14 @@ int main() {
 #define CREATE_A(var, value) Tracker<A> var(value, std::string(#var), "")
 
 #ifdef MISTAKE
-    B b;
-    b.big_array[0] = 1;
-    A a{CreateA_move(b)};
+    CREATE_B(b, B{});
+    b.GetObject().big_array[0] = 1;
+    CREATE_A(a, CreateA_move(b.GetObject()));
     // we expect b is still valid
     std::cout << "trying to get the value\n";
-    std::cout << b.big_array[0] << std::endl;
-    std::cout << "move: created A.big_array_too = " << a.big_array_too << std::endl;
-    std::cout << "move: still existing B.big_array = " << b.big_array << std::endl;
+    std::cout << b.GetObject().big_array[0] << std::endl; // segfault, because in constructor we put nullptr into  dying object
+    std::cout << "move: created A.big_array_too = " << a.GetObject().big_array_too << std::endl;
+    std::cout << "move: still existing B.big_array = " << b.GetObject().big_array << std::endl;
 #endif
     // B b1;
     std::cout << "c...\n";
@@ -184,9 +184,9 @@ int main() {
     std::cout << "forward: created A.big_array_too = " << reinterpret_cast<uint64_t>(a1.GetObject().big_array_too) << std::endl;
     std::cout << "forward: still existing B.big_array = " << reinterpret_cast<uint64_t>(b1.GetObject().big_array) << std::endl;
 
-    A a2{CreateA_forward(B{})};
-    std::cout << "forward: created A.big_array_too = " << a2.big_array_too << std::endl;
+    CREATE_A(a2, CreateA_forward(B{}));
+    std::cout << "forward: created A.big_array_too = " << a2.GetObject().big_array_too << std::endl;
 
-    A a3{my_forward<B>(B{})};
-    std::cout << "forward: created A.big_array_too = " << a3.big_array_too << std::endl;
+    CREATE_A(a3, my_forward<B>(B{}));
+    std::cout << "forward: created A.big_array_too = " << a3.GetObject().big_array_too << std::endl;
 }

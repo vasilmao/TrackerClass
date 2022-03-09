@@ -88,7 +88,14 @@ class Tracker {
 
     Tracker<T>(T&& object, const std::string& var_name, const std::string& parent_history) {
         TRACK_CALL
+        // std::cout << "da move\n";
+        // std::cout << "other: " << std::to_string(object) << std::endl;
+        // std::cout << "my: " << std::to_string(object_) << std::endl;
         std::swap(object, object_);
+        // std::cout << "swapped\n";
+        // std::cout << "other: " << std::to_string(object) << std::endl;
+        // std::cout << "my: " << std::to_string(object_) << std::endl;
+        // std::cout << "d\n";
         index_ = node_indexer_++;
         if (var_name.length() == 0) {
             SetAnonVarName();
@@ -99,6 +106,7 @@ class Tracker {
         SetHistory(parent_history);
         LogDumpCtor();
     }
+
 
     Tracker<T>(const Tracker<T>& other, const std::string& var_name, const std::string&) : object_(other.object_), var_name_(var_name) {
         TRACK_CALL
@@ -281,6 +289,11 @@ class Tracker {
         return *this;
     }
 
+    ~Tracker() {
+        TRACK_CALL
+        std::cout << "Tracker deleted\n";
+    }
+
   private:
     
     void SetAnonVarName() {
@@ -385,6 +398,16 @@ class Tracker {
 
     void LogDumpCtor() {
         Logger::GetInstance() << history_ + "\n";
+    }
+
+  public:
+    
+    T& GetObject() & {
+        return object_;
+    }
+
+    T&& GetObject() && {
+        return object_;
     }
 };
 

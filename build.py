@@ -12,6 +12,7 @@ LXX_FLAGS = []
 CXX_FLAGS = [
     "-std=c++17",
     # "-fno-elide-constructors",
+    # "-DMISTAKE"
     ]
 
 CXX = "g++"
@@ -78,6 +79,18 @@ makefile_content = ""
 # spawn main targets
 
 targets_list = []
+
+makefile_content += "all: "
+
+for file in os.listdir(os.path.join(os.path.curdir, "targets")):
+    print("target file:", file)
+    file_name_without_extension = file[:file.rfind(".")]
+    target_file = os.path.join(os.path.curdir, "targets", file_name_without_extension)
+    if (os.path.isfile(target_file + ".cpp")):
+        out_filename = BIN_DIR + "/" + file_name_without_extension + ".out"
+        makefile_content += out_filename + " "
+
+makefile_content += "\n\n"
 
 for file in os.listdir(os.path.join(os.path.curdir, "targets")):
     print("target file:", file)

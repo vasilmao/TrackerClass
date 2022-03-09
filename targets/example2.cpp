@@ -4,34 +4,189 @@
 #include <thread>
 #include <iostream>
 
-class Empty {
-    int a = 5;
+#include "GraphDumper.hpp"
+#include "Logger.hpp"
+#include "SingletonHandler.hpp"
+#include "CallStackTracker.hpp"
+
+class B {
   public:
-    Empty(){
-        std::cout << "Empty constructor" << std::endl;
+    int* big_array;
+
+    B() {
+        TRACK_CALL
+        big_array = new int[100];
+        std::cout << "created B with " << reinterpret_cast<uint64_t>(big_array) << std::endl;
     }
-    Empty(const Empty& other) {
-        std::cout << "Oh no!!! Copying :(" << std::endl;
+
+    B(const B&  other) {
+        TRACK_CALL
+        big_array = new int[100];
+        for (int i = 0; i < 100; ++i) {
+            big_array[i] = other.big_array[i];
+        }
+        std::cout << "LOOOONG copying......." << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
-    Empty(Empty&& other) {
-        std::cout << "Move!! :)" << std::endl;
+
+    B(B&& other) {
+        TRACK_CALL
+        big_array = other.big_array;
+        other.big_array = nullptr;
+        std::cout << "fast move!!!1" << std::endl;
     }
-    ~Empty() {
-        std::cout << "Destructor" << std::endl;
+
+    B& operator=(const B&  other) {
+        TRACK_CALL
+        big_array = new int[100];
+        for (int i = 0; i < 100; ++i) {
+            big_array[i] = other.big_array[i];
+        }
+        std::cout << "LOOOONG copying......." << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        return *this;
+    }
+
+    B& operator=(B&& other) {
+        TRACK_CALL
+        std::swap(big_array, other.big_array);
+        std::cout << "fast move!!!2" << std::endl;
+        return *this;
+    }
+
+    ~B() {
+        TRACK_CALL
+        std::cout << "deleted B with " << reinterpret_cast<uint64_t>(big_array) << std::endl;
+        if (big_array != nullptr) {
+            delete[] big_array;
+        }
     }
 };
 
-template<typename T>
-using NOREF = typename std::remove_reference<T>::type;
+class A {
+  public:
+    int* big_array_too = nullptr;
+
+    A() {
+        big_array_too = nullptr;
+    }
+
+    A(const B& b) {
+        TRACK_CALL
+        big_array_too = new int[100];
+        for (int i = 0; i < 100; ++i) {
+            big_array_too[i] = b.big_array[i];
+        }
+        Logger::GetInstance() << "<font color=\"red\">LOOOONG copying.......</font>\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+    A(B&& b) {
+        TRACK_CALL
+        big_array_too = b.big_array;
+        b.big_array = nullptr;
+        Logger::GetInstance() << "<font color=\"#7FFFD4\">fast move!!!</font>\n";
+    }
+    A(A&& other) {
+        TRACK_CALL
+        std::swap(big_array_too, other.big_array_too);
+    }
+
+    A(const A& other) {
+        TRACK_CALL
+        big_array_too = new int[100];
+        for (int i = 0; i < 100; ++i) {
+            big_array_too[i] = other.big_array_too[i];
+        }
+        Logger::GetInstance() << "<font color=\"red\">LOOOONG copying....... from another A</font>\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+    A& operator=(const A& other) {
+        if (big_array_too != nullptr) {
+            delete big_array_too;
+        }
+        big_array_too = new int[100];
+        for (int i = 0; i < 100; ++i) {
+            big_array_too[i] = other.big_array_too[i];
+        }
+        Logger::GetInstance() << "<font color=\"red\">LOOOONG copying....... from another A</font>\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        return *this;
+    }
+    A& operator=(A&& other) {
+        std::swap(big_array_too, other.big_array_too);
+        Logger::GetInstance() << "<font color=\"#7FFFD4\">fast move!!! from another A</font>\n";
+        return *this;
+    }
+    ~A() {
+        TRACK_CALL
+        if (big_array_too != nullptr) {
+            delete[] big_array_too;
+        }
+    }
+};
+
+namespace std {
+    inline string to_string(A& a) {
+        string answer = "A{ ptr = ";
+        answer += to_string(reinterpret_cast<unsigned long long>(a.big_array_too));
+        answer += "}";
+        return answer;
+    }
+
+    inline string to_string(B& b) {
+        string answer = "B{ ptr = ";
+        answer += to_string(reinterpret_cast<unsigned long long>(b.big_array));
+        answer += "}";
+        return answer;
+    }
+}
+
+#include "Tracker.hpp"
+#include "mystd.hpp"
 
 template<typename T>
-NOREF<T>* create_copy(T&& obj) {
-    return new NOREF<T>(obj);
+A CreateA_move(T&& other) {
+    TRACK_CALL
+    return A{my_move(other)};
+}
+
+template<typename T>
+A CreateA_forward(T&& other) {
+    TRACK_CALL
+    std::cout << "eee\n";
+    return A{my_forward<T>(other)};
 }
 
 int main() {
-    Empty a;
-    Empty* p1 = create_copy(a);
-    Empty* p2 = create_copy(Empty{});
+    HANDLE_SINGLETONS
+    TRACK_CALL
+
+
+#define CREATE_B(var, value) Tracker<B> var(value, std::string(#var), "")
+#define CREATE_A(var, value) Tracker<A> var(value, std::string(#var), "")
+
+#ifdef MISTAKE
+    B b;
+    b.big_array[0] = 1;
+    A a{CreateA_move(b)};
+    // we expect b is still valid
+    std::cout << "trying to get the value\n";
+    std::cout << b.big_array[0] << std::endl;
+    std::cout << "move: created A.big_array_too = " << a.big_array_too << std::endl;
+    std::cout << "move: still existing B.big_array = " << b.big_array << std::endl;
+#endif
+    // B b1;
+    std::cout << "c...\n";
+    CREATE_B(b1, B{});
+    // A a1{CreateA_forward(b1)};
+    std::cout << "how...\n";
+    CREATE_A(a1, CreateA_forward(b1.GetObject()));
+    std::cout << "forward: created A.big_array_too = " << reinterpret_cast<uint64_t>(a1.GetObject().big_array_too) << std::endl;
+    std::cout << "forward: still existing B.big_array = " << reinterpret_cast<uint64_t>(b1.GetObject().big_array) << std::endl;
+
+    A a2{CreateA_forward(B{})};
+    std::cout << "forward: created A.big_array_too = " << a2.big_array_too << std::endl;
+
+    A a3{my_forward<B>(B{})};
+    std::cout << "forward: created A.big_array_too = " << a3.big_array_too << std::endl;
 }

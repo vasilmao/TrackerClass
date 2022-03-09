@@ -127,16 +127,16 @@ class A {
 
 namespace std {
     inline string to_string(A& a) {
-        string answer = "A{ ptr = ";
+        string answer = "A, ptr = ";
         answer += to_string(reinterpret_cast<unsigned long long>(a.big_array_too));
-        answer += "}";
+        // answer += "}";
         return answer;
     }
 
     inline string to_string(B& b) {
-        string answer = "B{ ptr = ";
+        string answer = "B, ptr = ";
         answer += to_string(reinterpret_cast<unsigned long long>(b.big_array));
-        answer += "}";
+        // answer += "}";
         return answer;
     }
 }
@@ -151,10 +151,10 @@ A CreateA_move(T&& other) {
 }
 
 template<typename T>
-A CreateA_forward(T&& other) {
+Tracker<A> CreateA_forward(T&& other) {
     TRACK_CALL
     std::cout << "eee\n";
-    return A{my_forward<T>(other)};
+    return Tracker<A>{my_forward<T>(other)};
 }
 
 int main() {

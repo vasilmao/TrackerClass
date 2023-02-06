@@ -4,6 +4,12 @@
 #include <thread>
 #include <iostream>
 
+class StrangeClass;
+
+namespace std {
+    string to_string(StrangeClass& sc);
+}
+
 class StrangeClass {
   private:
     std::vector<int> a;
@@ -34,11 +40,18 @@ class StrangeClass {
         std::swap(a, other.a);
         return *this;
     }
+    friend std::string std::to_string(StrangeClass& sc);
 };
 
 namespace std {
     inline string to_string(StrangeClass& sc) {
-        return "dura";
+        string ans = "";
+        for (int i = 0; i < 3; ++i) {
+            ans += to_string(sc.a[i]);
+            ans += ",";
+        }
+        ans += "...";
+        return ans;
     }
 }
 
@@ -65,6 +78,7 @@ void fast_swap(T& a, T& b) {
 }
 
 int main() {
+    // srand (time(NULL));
     HANDLE_SINGLETONS
     TRACK_CALL
     Tracker<StrangeClass> a{StrangeClass{}, "a", ""};

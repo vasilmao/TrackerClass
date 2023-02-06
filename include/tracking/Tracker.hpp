@@ -160,6 +160,8 @@ class Tracker {
         TRACK_CALL
         object_ = other.object_;
         GRAPH_DUMP_ASSIGNMENT_COPY_OPERATOR((*this), =, other)
+        SetRelativeHistory(other);
+        LogDumpHistory();
         // GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), =, other)
         return *this;
     }
@@ -168,6 +170,8 @@ class Tracker {
         TRACK_CALL
         std::swap(object_, other.object_);
         GRAPH_DUMP_ASSIGNMENT_MOVE_OPERATOR((*this), =, other)
+        SetRelativeHistory(other);
+        LogDumpHistory();
         // GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), =, other)
         return *this;
     }
@@ -320,6 +324,7 @@ class Tracker {
     }
 
     void SetHistory(const std::string& parent_history) {
+        // srand (time(NULL));
         if (parent_history == "") {
             SetHistory();
             return;
@@ -336,6 +341,7 @@ class Tracker {
     }
 
     void SetRelativeHistory(const Tracker<T>& other) {
+        // srand (time(NULL));
         history_ = "<font color=\"";
         history_ += colors[(rand() % colors_cnt)];
         history_ += "\">";
@@ -406,6 +412,10 @@ class Tracker {
     }
 
     void LogDumpCtor() {
+        Logger::GetInstance() << history_ + "\n";
+    }
+
+    void LogDumpHistory() {
         Logger::GetInstance() << history_ + "\n";
     }
 

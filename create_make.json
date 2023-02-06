@@ -1,0 +1,20 @@
+{
+    "targets" : {
+        "targets/main.cpp" : "a.out",
+        "targets/example1.cpp" : "example1.out",
+        "targets/example2.cpp" : "example2.out"
+    },
+
+    "prohibited_dirs" : [
+        ".vscode",
+        ".git"
+    ],
+
+    "flags" : {
+        "IFLAGS" : "ALL",
+        "CFLAGS" : [
+            "-Wall",
+            "-Werror"
+        ]
+    }
+}

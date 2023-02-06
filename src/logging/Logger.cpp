@@ -19,7 +19,7 @@ Logger::~Logger() {
 Logger& Logger::GetInstance() {
     if (instance_ == nullptr) {
         instance_ = new Logger{};
-        (*instance_) << "<!DOCTYPE html>\n<html>\n<body style=\"background-color: gray\">\n<pre>\n";
+        (*instance_) << "<!DOCTYPE html>\n<html>\n<body style=\"background-color: gray\"><pre>\n\n";
         (*instance_) << "<font color=\"blue\">log started ";
 
         time_t rawtime;
@@ -48,12 +48,12 @@ void Logger::Release() {
         time (&rawtime);
         timeinfo = localtime(&rawtime);
 
-        strftime(buffer,sizeof(buffer),"%d-%m-%Y %H:%M:%S</font>\n",timeinfo);
+        strftime(buffer,sizeof(buffer),"%d-%m-%Y %H:%M:%S</font></pre>\n",timeinfo);
         std::string time_str(buffer);
 
         (*instance_) << time_str;
 
-        (*instance_) << "</pre>\n</body>\n</html>\n";
+        (*instance_) << "\n</body>\n</html>\n";
 
         delete instance_;
     }

@@ -14,7 +14,11 @@
         "IFLAGS" : "ALL",
         "CFLAGS" : [
             "-Wall",
-            "-Werror"
+            "-Werror",
+            "-fsanitize=address"
+        ],
+        "LFLAGS" : [
+            "-fsanitize=address"
         ]
     }
 }

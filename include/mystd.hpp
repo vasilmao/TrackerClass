@@ -30,6 +30,7 @@ typename my_remove_reference<T>::type&& my_move(T&& obj) {
 template<typename T>
 T&& my_forward(typename my_remove_reference<T>::type& obj) {
     TRACK_CALL
+    std::cout << "yeee\n";
     Logger::GetInstance() << "FORWARD: lvalue\n";
     return static_cast<T&&>(obj);
 }
@@ -37,6 +38,7 @@ T&& my_forward(typename my_remove_reference<T>::type& obj) {
 template<typename T>
 T&& my_forward(typename my_remove_reference<T>::type&& obj) {
     TRACK_CALL
+    std::cout << "yeee1\n";
     Logger::GetInstance() << "FORWARD: rvalue\n";
     return static_cast<T&&>(obj);
 }

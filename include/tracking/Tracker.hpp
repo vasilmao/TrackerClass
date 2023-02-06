@@ -56,6 +56,7 @@ class Tracker {
   public:
 
     Tracker<T>(const T& object, const std::string& parent_history="") : object_(object) {
+        std::cout << "da anon lvalue\n";
         TRACK_CALL
         index_ = node_indexer_++;
         // index_ = TRACKER_COUNTER++;
@@ -65,10 +66,10 @@ class Tracker {
         LogDumpCtor();
     }
     Tracker<T>(T&& object, const std::string& parent_history="") {
+        std::cout << "da anon rvalue\n";
         TRACK_CALL
         std::swap(object_, object);
         index_ = node_indexer_++;
-        // index_ = TRACKER_COUNTER++;
         SetAnonVarName();
         SetHistory(parent_history);
         GraphDumpObject();
@@ -76,9 +77,9 @@ class Tracker {
     }
 
     Tracker<T>(const T& object, const std::string& var_name, const std::string& parent_history) : object_(object) {
+        std::cout << "da lvalue from object\n";
         TRACK_CALL
         index_ = node_indexer_++;
-        // index_ = TRACKER_COUNTER++;
         if (var_name.length() == 0) {
             SetAnonVarName();
         } else {
@@ -90,15 +91,9 @@ class Tracker {
     }
 
     Tracker<T>(T&& object, const std::string& var_name, const std::string& parent_history) {
+        std::cout << "da rvalue from object\n";
         TRACK_CALL
-        // std::cout << "da move\n";
-        // std::cout << "other: " << std::to_string(object) << std::endl;
-        // std::cout << "my: " << std::to_string(object_) << std::endl;
-        std::swap(object, object_);
-        // std::cout << "swapped\n";
-        // std::cout << "other: " << std::to_string(object) << std::endl;
-        // std::cout << "my: " << std::to_string(object_) << std::endl;
-        // std::cout << "d\n";
+        std::swap(object_, object);
         index_ = node_indexer_++;
         // index_ = TRACKER_COUNTER++;
         if (var_name.length() == 0) {
@@ -113,6 +108,7 @@ class Tracker {
 
 
     Tracker<T>(const Tracker<T>& other, const std::string& var_name, const std::string&) : object_(other.object_), var_name_(var_name) {
+        std::cout << "da lvalue from object, skipping? history\n";
         TRACK_CALL
         index_ = node_indexer_++;
         // index_ = TRACKER_COUNTER++;
@@ -123,6 +119,7 @@ class Tracker {
     }
 
     Tracker<T>(Tracker<T>&& other, const std::string& var_name, const std::string&)      : var_name_(var_name) {
+        std::cout << "da rvalue from object, skipping? history\n";
         TRACK_CALL
         std::swap(object_, other.object_);
         index_ = node_indexer_++;
@@ -134,6 +131,7 @@ class Tracker {
     }
 
     Tracker<T>(const Tracker<T>& other) : object_(other.object_) {
+        std::cout << "da lvalue from tracker without history\n";
         TRACK_CALL
         index_ = node_indexer_++;
         // index_ = TRACKER_COUNTER++;
@@ -145,10 +143,10 @@ class Tracker {
     }
 
     Tracker<T>(Tracker<T>&& other) {
+        std::cout << "da rvalue from tracker without history\n";
         TRACK_CALL
         std::swap(object_, other.object_);
         index_ = node_indexer_++;
-        // index_ = TRACKER_COUNTER++;
         SetAnonVarName();
         SetEdgeFrom(other, "move", "green");
         GraphDumpObject();
@@ -157,22 +155,22 @@ class Tracker {
     }
 
     Tracker<T>& operator=(const Tracker<T>& other) {
+        std::cout << "da = lvalue\n";
         TRACK_CALL
         object_ = other.object_;
         GRAPH_DUMP_ASSIGNMENT_COPY_OPERATOR((*this), =, other)
         SetRelativeHistory(other);
         LogDumpHistory();
-        // GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), =, other)
         return *this;
     }
 
     Tracker<T>& operator=(Tracker<T>&& other) {
+        std::cout << "da = rvalue\n";
         TRACK_CALL
         std::swap(object_, other.object_);
         GRAPH_DUMP_ASSIGNMENT_MOVE_OPERATOR((*this), =, other)
         SetRelativeHistory(other);
         LogDumpHistory();
-        // GRAPH_DUMP_COMPOUND_ASSIGNMENT_OPERATOR((*this), =, other)
         return *this;
     }
 

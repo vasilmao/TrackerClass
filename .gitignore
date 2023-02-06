@@ -2,3 +2,7 @@
 build
 bin
 obj
+*.out
+graph
+graph.txt
+*.html

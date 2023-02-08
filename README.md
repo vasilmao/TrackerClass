@@ -21,7 +21,7 @@ potomushto dora dura superdura dora dura...
 
 ## example2.cpp
 This is the example of wrong move usage (created b, it moved to a, so has big_array=nullptr, but still expected to be valid and memory will be released) and how forward fixes it
-![graph](img/graph10.svg.svg)
+![graph](img/graph10.svg)
 The illustration (It is not fair because you can't spawn graph when your program gets segfault, this graph was created when we skip the line with checking b.big_array[0]. Other chains of variable are correct.)
 
 ### my own remove reference, move, forward

@@ -111,7 +111,7 @@ int main() {
     CREATE_B(a, CreateB_move(b));
     // we expect b is still valid
     std::cout << "trying to get the value\n";
-    // std::cout << b.GetObject().big_array[0] << std::endl; // segfault, because in constructor we put nullptr into  dying object
+    std::cout << b.GetObject().big_array[0] << std::endl; // segfault, because in constructor we put nullptr into  dying object
     std::cout << "move: created A.big_array_too = " << a.GetObject().big_array << std::endl;
     std::cout << "move: still existing B.big_array = " << b.GetObject().big_array << std::endl;
 #endif

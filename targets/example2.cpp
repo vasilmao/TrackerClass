@@ -91,7 +91,7 @@ Tracker<B> CreateB_move(T&& other) {
 }
 
 template<typename T>
-Tracker<B> StrangeCreateB_forward(T&& other) {
+Tracker<B> CreateB_forward(T&& other) {
     TRACK_CALL
     std::cout << "eee\n";
     return Tracker<B>{my_forward<T>(other)};
@@ -106,26 +106,26 @@ int main() {
 // #define CREATE_A(var, value) Tracker<A> var(value, std::string(#var), "")
 
 #ifdef MISTAKE
-    CREATE_B(b, B{});
+    CREATE_B(b, B{100});
     b.GetObject().big_array[0] = 1;
     CREATE_B(a, CreateB_move(b));
     // we expect b is still valid
     std::cout << "trying to get the value\n";
-    std::cout << b.GetObject().big_array[0] << std::endl; // segfault, because in constructor we put nullptr into  dying object
+    // std::cout << b.GetObject().big_array[0] << std::endl; // segfault, because in constructor we put nullptr into  dying object
     std::cout << "move: created A.big_array_too = " << a.GetObject().big_array << std::endl;
     std::cout << "move: still existing B.big_array = " << b.GetObject().big_array << std::endl;
 #endif
     // B b1;
     std::cout << "c...\n";
     CREATE_B(b1, B{100});
-    // A a1{StrangeCreateB_forward(b1)};
+    // A a1{CreateB_forward(b1)};
     std::cout << "how...\n";
     std::cout << b1.GetObject().big_array << "\n";
-    CREATE_B(b2, StrangeCreateB_forward(b1));
+    CREATE_B(b2, CreateB_forward(b1));
     std::cout << "forward: created A.big_array_too = " << reinterpret_cast<uint64_t>(b2.GetObject().big_array) << std::endl;
     std::cout << "forward: still existing B.big_array = " << reinterpret_cast<uint64_t>(b1.GetObject().big_array) << std::endl;
 
-    CREATE_B(b3, StrangeCreateB_forward(B{100}));
+    CREATE_B(b3, CreateB_forward(B{100}));
     std::cout << "forward: created A.big_array_too = " << b3.GetObject().big_array << std::endl;
 
     CREATE_B(b4, my_forward<B>(B{100}));

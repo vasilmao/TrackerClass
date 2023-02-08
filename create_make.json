@@ -15,10 +15,13 @@
         "CFLAGS" : [
             "-Wall",
             "-Werror",
-            "-fsanitize=address"
+            "-fsanitize=address",
+            "-DMISTAKE",
+            "-g"
         ],
         "LFLAGS" : [
-            "-fsanitize=address"
+            "-fsanitize=address",
+            "-g"
         ]
     }
 }

@@ -20,9 +20,9 @@ the "fast" version
 potomushto dora dura superdura dora dura...
 
 ## example2.cpp
-This is the example of wrong move usage and how forward fixes it
-![graph](https://user-images.githubusercontent.com/34096563/157386767-9a5142eb-b3ce-4732-a679-906bca2dd02b.svg)
-The illustration (It is not fair because you can't spawn graph when your program gets segfault, this graph was created when ptr was not zeroed in move and default contructor. The b variable has zero at after move. Other chains of variable are correct.)
+This is the example of wrong move usage (created b, it moved to a, so has big_array=nullptr, but still expected to be valid and memory will be released) and how forward fixes it
+![graph](img/graph10.svg.svg)
+The illustration (It is not fair because you can't spawn graph when your program gets segfault, this graph was created when we skip the line with checking b.big_array[0]. Other chains of variable are correct.)
 
 ### my own remove reference, move, forward
 mystd.hpp have my own versions remove_reference, move and forward written for educational purposes
